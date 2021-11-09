@@ -44,7 +44,7 @@ def main():
     # cv2.imshow("k4a", capture.depth)
     # cv2.imshow("k4a", capture.ir)
 
-    directory = r'C:\Users\OpenARK\Desktop\stereo-rectify\example\best_image_callibration'
+    directory = r'C:\Users\OpenARK\Desktop\stereo-rectify\example\ir_hist_equalized_image_set_TEST2'
     os.chdir(directory)
     i = 0
     cv2.namedWindow("test")
@@ -70,11 +70,11 @@ def main():
         #Pretty good and resembles Kinect SDK's viewer the most
         ir_clipped_scaled_16 = np.clip(raw_ir_16, 0, 655 * 1) * 100
         ir_clipped_scaled_8 = (ir_clipped_scaled_16 / 256).astype(np.uint8)
-        cv2.imshow('raw IR 8 Clipped Scaled', ir_clipped_scaled_8)
+        cv2.imshow('raw IR 8 Scaled', ir_clipped_scaled_8)
 
         #Up close objects are saturated, but we can see at a farther depth much better, but has a lot of noise
         ir_clipped_scaled_equalized_8 = pcv.hist_equalization((ir_clipped_scaled_16 / 256).astype(np.uint8)) #hist takes uint8, not uint16
-        cv2.imshow('raw IR 8 Clipped Scaled Equalized', ir_clipped_scaled_equalized_8)
+        cv2.imshow('raw IR 8 Scaled Equalized', ir_clipped_scaled_equalized_8)
 
 
 
@@ -166,7 +166,7 @@ def main():
             break
         elif key % 256 == 32: # SPACE pressed save photo
 
-            cv2.imwrite('color-' + str(i) + '.png', r_img_equalized)
+            cv2.imwrite('color-' + str(i) + '.png', r_img)
             cv2.imwrite('ir-' + str(i) + '.png', ir_8_equalized)
 
             # cv2.imwrite("PassiveIR_Raw.png", raw_ir)
