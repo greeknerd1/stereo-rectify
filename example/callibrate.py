@@ -133,6 +133,7 @@ R1, R2, P1, P2, Q, roi_left, roi_right = cv2.stereoRectify(K1, D1, K2, D2, (w, h
 # np.save('./savedCoeff/rightMapX.npy', rightMapX)
 # np.save('./savedCoeff/rightMapY.npy', rightMapY)
 
+#Load saved coefficients
 leftMapX = np.load('./savedCoeff/leftMapX.npy')
 leftMapY = np.load('./savedCoeff/leftMapY.npy')
 rightMapX = np.load('./savedCoeff/rightMapX.npy')
