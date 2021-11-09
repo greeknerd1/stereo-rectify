@@ -32,7 +32,7 @@ color_new_width = 720 / 576 * 640
 color_crop = int((color_shape[1] - color_new_width) / 2)
 
 # Extracting path of individual image stored in a given directory
-imageDir = 'equalizedImagesNearBetter' #(Equalized R and Equalized IR, most promising)
+imageDir = 'equalizedImagesNearBetter' #equalizedImagesNearBetter (Equalized R and Equalized IR, most promising)
 #Demo on:
 #equalizedImagesFarBetter (Equalized R and Scaled Equalized IR, noisy)
 #only_ir_scaled_image_set (R and Scaled IR, resembles SDK viewer)
