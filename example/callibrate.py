@@ -125,18 +125,18 @@ R1, R2, P1, P2, Q, roi_left, roi_right = cv2.stereoRectify(K1, D1, K2, D2, (w, h
 
 
 #Saving coefficients
-leftMapX, leftMapY = cv2.initUndistortRectifyMap(K1, D1, R1, P1, (w, h), cv2.CV_32FC1)
-rightMapX, rightMapY = cv2.initUndistortRectifyMap(K2, D2, R2, P2, (w, h), cv2.CV_32FC1)
+# leftMapX, leftMapY = cv2.initUndistortRectifyMap(K1, D1, R1, P1, (w, h), cv2.CV_32FC1)
+# rightMapX, rightMapY = cv2.initUndistortRectifyMap(K2, D2, R2, P2, (w, h), cv2.CV_32FC1)
 
-np.save('./savedCoeff/leftMapX.npy', leftMapX)
-np.save('./savedCoeff/leftMapY.npy', leftMapY)
-np.save('./savedCoeff/rightMapX.npy', rightMapX)
-np.save('./savedCoeff/rightMapY.npy', rightMapY)
+# np.save('./savedCoeff/leftMapX.npy', leftMapX)
+# np.save('./savedCoeff/leftMapY.npy', leftMapY)
+# np.save('./savedCoeff/rightMapX.npy', rightMapX)
+# np.save('./savedCoeff/rightMapY.npy', rightMapY)
 
-# leftMapX = np.load('./savedCoeff/leftMapX.npy')
-# leftMapY = np.load('./savedCoeff/leftMapY.npy')
-# rightMapX = np.load('./savedCoeff/rightMapX.npy')
-# rightMapY = np.load('./savedCoeff/rightMapY.npy')
+leftMapX = np.load('./savedCoeff/leftMapX.npy')
+leftMapY = np.load('./savedCoeff/leftMapY.npy')
+rightMapX = np.load('./savedCoeff/rightMapX.npy')
+rightMapY = np.load('./savedCoeff/rightMapY.npy')
 
 
 
