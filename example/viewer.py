@@ -44,7 +44,7 @@ def main():
     # cv2.imshow("k4a", capture.depth)
     # cv2.imshow("k4a", capture.ir)
 
-    directory = r'C:\Users\OpenARK\Desktop\stereo-rectify\example\ir_hist_equalized_image_set_TEST2'
+    directory = r'C:\Users\OpenARK\Desktop\stereo-rectify\example\both_hist_equalized_image_set2'
     os.chdir(directory)
     i = 0
     cv2.namedWindow("test")
@@ -65,16 +65,16 @@ def main():
 
         #We can see up close objects, but farther depth is fully black
         ir_8_equalized = pcv.hist_equalization(raw_ir_8)
-        cv2.imshow('IR 8 Equalized', ir_8_equalized)
+        cv2.imshow('IR 8 Equalized (Most promising, up close good)', ir_8_equalized)
 
         #Pretty good and resembles Kinect SDK's viewer the most
         ir_clipped_scaled_16 = np.clip(raw_ir_16, 0, 655 * 1) * 100
         ir_clipped_scaled_8 = (ir_clipped_scaled_16 / 256).astype(np.uint8)
-        cv2.imshow('raw IR 8 Scaled', ir_clipped_scaled_8)
+        cv2.imshow('raw IR 8 Scaled (Resembles SDK Viewer, up close v saturated)', ir_clipped_scaled_8)
 
         #Up close objects are saturated, but we can see at a farther depth much better, but has a lot of noise
         ir_clipped_scaled_equalized_8 = pcv.hist_equalization((ir_clipped_scaled_16 / 256).astype(np.uint8)) #hist takes uint8, not uint16
-        cv2.imshow('raw IR 8 Scaled Equalized', ir_clipped_scaled_equalized_8)
+        cv2.imshow('raw IR 8 Scaled Equalized (Shows most scene but noisy)', ir_clipped_scaled_equalized_8)
 
 
 
