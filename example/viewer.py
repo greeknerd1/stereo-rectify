@@ -38,7 +38,7 @@ def main():
     k4a = PyK4A(
         Config(
             color_resolution=pyk4a.ColorResolution.RES_720P,
-            depth_mode=pyk4a.DepthMode.NFOV_UNBINNED,
+            depth_mode=pyk4a.DepthMode.PASSIVE_IR,
             synchronized_images_only=True,
         )
     )
@@ -66,7 +66,7 @@ def main():
     # cv2.imshow("k4a", capture.depth)
     # cv2.imshow("k4a", capture.ir)
 
-    directory = r'C:\Users\OpenARK\Desktop\stereo-rectify\example\both_hist_equalized_image_set2'
+    directory = r'C:\Users\OpenARK\Desktop\stereo-rectify\example\outside_checker'
     os.chdir(directory)
     i = 0
     cv2.namedWindow("test")
@@ -76,13 +76,13 @@ def main():
         r_img = capture.color[:, :, 2]
         r_img_equalized = pcv.hist_equalization(r_img)
 
-        #cv2.imshow('r-img', r_img)
-        #cv2.imshow('Equalized r-img', r_img_equalized)
+        cv2.imshow('r-img', r_img)
+        cv2.imshow('Equalized r-img', r_img_equalized)
 
         raw_ir_16 = capture.ir
         raw_ir_8 = (raw_ir_16 / 256).astype(np.uint8)
 
-        # cv2.imshow('raw IR 16', raw_ir_16)
+        cv2.imshow('raw IR 16', raw_ir_16)
         cv2.imshow('raw IR 8', raw_ir_8)
 
         ir_16_equalized = hist_equalization_16(raw_ir_16)
@@ -191,8 +191,8 @@ def main():
             break
         elif key % 256 == 32: # SPACE pressed save photo
 
-            cv2.imwrite('color-' + str(i) + '.png', r_img)
-            cv2.imwrite('ir-' + str(i) + '.png', ir_8_equalized)
+            cv2.imwrite('color-' + str(i) + '.png', r_img_equalized)
+            cv2.imwrite('ir-' + str(i) + '.png', ir_16_equalized)
 
             # cv2.imwrite("PassiveIR_Raw.png", raw_ir)
             # cv2.imwrite("PassiveIR_Scaled.png", ir_scaled)
