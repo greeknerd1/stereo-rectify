@@ -12,6 +12,28 @@ from pyk4a import Config, PyK4A
 #     WFOV_UNBINNED = 4
 #     PASSIVE_IR = 5
 
+def hist_equalization_16(img):
+    #img_tif=cv2.imread("scan_before threthold_873.tif",cv2.IMREAD_ANYDEPTH)
+    #img = np.asarray(img)
+    flat = img.flatten()
+    hist = np.histogram(flat, bins=65536)
+    
+    cs = np.cumsum(hist[0])
+    # re-normalize cumsum values to be between 0-255
+
+    # numerator & denomenator
+    nj = (cs - cs.min()) * 65535
+    N = cs.max() - cs.min()
+
+    # re-normalize the cdf
+    cs = nj / N
+    cs = cs.astype('uint16')
+    img_new = cs[flat]
+    img_new = np.reshape(img_new, img.shape)
+    return img_new
+
+
+
 def main():
     k4a = PyK4A(
         Config(
@@ -54,14 +76,17 @@ def main():
         r_img = capture.color[:, :, 2]
         r_img_equalized = pcv.hist_equalization(r_img)
 
-        cv2.imshow('r-img', r_img)
-        cv2.imshow('Equalized r-img', r_img_equalized)
+        #cv2.imshow('r-img', r_img)
+        #cv2.imshow('Equalized r-img', r_img_equalized)
 
         raw_ir_16 = capture.ir
         raw_ir_8 = (raw_ir_16 / 256).astype(np.uint8)
 
         # cv2.imshow('raw IR 16', raw_ir_16)
         cv2.imshow('raw IR 8', raw_ir_8)
+
+        ir_16_equalized = hist_equalization_16(raw_ir_16)
+        cv2.imshow('IR 16 equalized', ir_16_equalized)
 
         #We can see up close objects, but farther depth is fully black
         ir_8_equalized = pcv.hist_equalization(raw_ir_8)
