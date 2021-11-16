@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 import os
 import glob
+import itertools
+
 
 from numpy.core.fromnumeric import argmax
 
@@ -32,7 +34,7 @@ color_new_width = 720 / 576 * 640
 color_crop = int((color_shape[1] - color_new_width) / 2)
 
 # Extracting path of individual image stored in a given directory
-imageDir = 'equalizedImagesFarBetter' #equalizedImagesNearBetter (Equalized R and Equalized IR, most promising)
+imageDir = 'outside_checker_straight' #equalizedImagesNearBetter (Equalized R and Equalized IR, most promising)
 #Demo on:
 #equalizedImagesFarBetter (Equalized R and Scaled Equalized IR, noisy)
 #only_ir_scaled_image_set (R and Scaled IR, resembles SDK viewer)
@@ -49,9 +51,9 @@ for camType in ['color', 'ir']:
             #gray = img[:, :, 2] #Take R channel only #recomment
             gray = img
         else: # Convert IR from 16 bit gray scale to 8 bit gray scale
-            gray = img 
-            #gray = gray / 256 #recomment
-            #gray = gray.astype(np.uint8) #recomment
+            gray = (img / 256).astype(np.uint8)
+            # gray = gray / 256 #recomment
+            # gray = gray.astype(np.uint8) #recomment
 
         # Find the chess board corners
         # If desired number of corners are found in the image then ret = true
@@ -80,8 +82,8 @@ for camType in ['color', 'ir']:
         else:
             print('Delete:', fname)
         
-        cv2.imshow('img',img)
-        cv2.waitKey(0)
+        # cv2.imshow('img',img)
+        # cv2.waitKey(0)
 
     cv2.destroyAllWindows()
 
@@ -101,43 +103,98 @@ for camType in ['color', 'ir']:
         print('IR camera callibration rms:', ret2)
 
 
-#look at previous flags in github and try those, try not moving the camera so much
-print('Calling Stereo Callibrate-------------------')
-rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), \
-                                flags=0
-                                #+ cv2.CALIB_FIX_INTRINSIC
-                                + cv2.CALIB_USE_INTRINSIC_GUESS #this for near, far
-                                #+ cv2.CALIB_FIX_PRINCIPAL_POINT
-                                + cv2.CALIB_FIX_FOCAL_LENGTH #this for near
-                                + cv2.CALIB_FIX_ASPECT_RATIO #this for near, far
-                                #+ cv2.CALIB_SAME_FOCAL_LENGTH #this for far
-                                + cv2.CALIB_ZERO_TANGENT_DIST #this for near, far
-                                + cv2.CALIB_RATIONAL_MODEL) #this for near, far
-                                #+ cv2.CALIB_THIN_PRISM_MODEL)
-                                #+ cv2.CALIB_FIX_S1_S2_S3_S4 #maybe for far
-                                #+ cv2.CALIB_TILTED_MODEL  
-                                #+ cv2.CALIB_FIX_TAUX_TAUY) #maybe for far
-print("Stereo calibration rms: ", rms)
 
+
+
+all_flags = [cv2.CALIB_FIX_INTRINSIC, cv2.CALIB_USE_INTRINSIC_GUESS, cv2.CALIB_FIX_PRINCIPAL_POINT, \
+                                cv2.CALIB_FIX_FOCAL_LENGTH, cv2.CALIB_FIX_ASPECT_RATIO, cv2.CALIB_SAME_FOCAL_LENGTH, \
+                                cv2.CALIB_ZERO_TANGENT_DIST, cv2.CALIB_RATIONAL_MODEL] #WITHOUT  cv2.CALIB_FIX_S1_S2_S3_S4, cv2.CALIB_TILTED_MODEL, cv2.CALIB_FIX_TAUX_TAUY
+
+
+# print('[cv2.CALIB_FIX_INTRINSIC (256), cv2.CALIB_USE_INTRINSIC_GUESS (1), cv2.CALIB_FIX_PRINCIPAL_POINT (4), \
+#                                 cv2.CALIB_FIX_FOCAL_LENGTH (16), cv2.CALIB_FIX_ASPECT_RATIO (2), cv2.CALIB_SAME_FOCAL_LENGTH (512), \
+#                                 cv2.CALIB_ZERO_TANGENT_DIST (8), cv2.CALIB_RATIONAL_MODEL (16384), \
+#                                 cv2.CALIB_FIX_S1_S2_S3_S4 (65536), cv2.CALIB_TILTED_MODEL (262144), cv2.CALIB_FIX_TAUX_TAUY (524288)]')
+
+# flagsComb = []
+# for L in range(0, len(all_flags)+1):
+#     for subset in itertools.combinations(all_flags, L):
+#         flagsComb.append(subset)
+
+# results = []
+# i = 0
+# for f in flagsComb:
+#     print(str(i) + '/' + str(len(flagsComb)))
+#     i += 1
+
+#     rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), flags=sum(f))
+#     R1, R2, P1, P2, Q, roi_left, roi_right = cv2.stereoRectify(K1, D1, K2, D2, (w, h), R, T, flags=cv2.CALIB_ZERO_DISPARITY, alpha=-1)
+#     x1, y1, w1, h1 = roi_left  
+#     x2, y2, w2, h2 = roi_right
+#     area = (w1 * h1) + (w2 * h2)
+#     if rms < 6 and area > 0:
+#         results.append((area, sum(f), f, rms))
+        
+
+# x = sorted(results)
+# for elem in x:
+#     print(elem)
+
+# with open("test123.txt", 'w') as f:
+#     for elem in x:
+#         f.write(str(elem) + "\n")
+#     f.close()
+    
+
+# for _ in range(10):
+#     print(cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), flags=525)[0])
+#     print('---------')
+# exit()
+
+
+
+#look at previous flags in github and try those, try not moving the camera so much
+# print('Calling Stereo Callibrate-------------------')
+# rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), \
+#                                 flags=0
+#                                 #+ cv2.CALIB_FIX_INTRINSIC)
+#                                 + cv2.CALIB_USE_INTRINSIC_GUESS #this for near, far
+#                                 + cv2.CALIB_FIX_PRINCIPAL_POINT
+#                                 #+ cv2.CALIB_FIX_FOCAL_LENGTH #this for near
+#                                 #+ cv2.CALIB_FIX_ASPECT_RATIO #this for near, far
+#                                 + cv2.CALIB_SAME_FOCAL_LENGTH #this for far
+#                                 + cv2.CALIB_ZERO_TANGENT_DIST) #this for near, far
+#                                 #+ cv2.CALIB_RATIONAL_MODEL) #this for near, far
+#                                 #+ cv2.CALIB_THIN_PRISM_MODEL)
+#                                 #+ cv2.CALIB_FIX_S1_S2_S3_S4 #maybe for far
+#                                 #+ cv2.CALIB_TILTED_MODEL  
+#                                 #+ cv2.CALIB_FIX_TAUX_TAUY) #maybe for far
+
+# print("Stereo calibration rms: ", rms)
+
+rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), flags=530) #530(with4) #540 774 16927 531 16387(without ir4)
+#                                                                                                                                           
 
 print('Calling Stereo Rectify-------------------')
 R1, R2, P1, P2, Q, roi_left, roi_right = cv2.stereoRectify(K1, D1, K2, D2, (w, h), R, T, flags=cv2.CALIB_ZERO_DISPARITY, alpha=-1)
-
+x1, y1, w1, h1 = roi_left  
+x2, y2, w2, h2 = roi_right
+print("ROIS", roi_left, roi_right)
 
 #Saving coefficients
-# leftMapX, leftMapY = cv2.initUndistortRectifyMap(K1, D1, R1, P1, (w, h), cv2.CV_32FC1)
-# rightMapX, rightMapY = cv2.initUndistortRectifyMap(K2, D2, R2, P2, (w, h), cv2.CV_32FC1)
+leftMapX, leftMapY = cv2.initUndistortRectifyMap(K1, D1, R1, P1, (w, h), cv2.CV_32FC1)
+rightMapX, rightMapY = cv2.initUndistortRectifyMap(K2, D2, R2, P2, (w, h), cv2.CV_32FC1)
 
-# np.save('./savedCoeff/leftMapX.npy', leftMapX)
-# np.save('./savedCoeff/leftMapY.npy', leftMapY)
-# np.save('./savedCoeff/rightMapX.npy', rightMapX)
-# np.save('./savedCoeff/rightMapY.npy', rightMapY)
+np.save('./savedCoeff/leftMapX.npy', leftMapX)
+np.save('./savedCoeff/leftMapY.npy', leftMapY)
+np.save('./savedCoeff/rightMapX.npy', rightMapX)
+np.save('./savedCoeff/rightMapY.npy', rightMapY)
 
-#Load saved coefficients
-leftMapX = np.load('./savedCoeff/leftMapX.npy')
-leftMapY = np.load('./savedCoeff/leftMapY.npy')
-rightMapX = np.load('./savedCoeff/rightMapX.npy')
-rightMapY = np.load('./savedCoeff/rightMapY.npy')
+# #Load saved coefficients
+# leftMapX = np.load('./savedCoeff/leftMapX.npy')
+# leftMapY = np.load('./savedCoeff/leftMapY.npy')
+# rightMapX = np.load('./savedCoeff/rightMapX.npy')
+# rightMapY = np.load('./savedCoeff/rightMapY.npy')
 
 
 
@@ -152,7 +209,7 @@ for i in range(len(color_images)):
     #leftFrame = leftFrame[:, :, 2] #crop, resize, take R channel #recomment
 
     rightFrame = cv2.imread(ir_images[i], cv2.IMREAD_UNCHANGED)
-    #rightFrame = (rightFrame / 256).astype(np.uint8) #conv from 16 bit grayscale to 8 bit #recomment
+    rightFrame = (rightFrame / 256).astype(np.uint8) #conv from 16 bit grayscale to 8 bit #recomment
 
     #leftMapX, leftMapY = cv2.initUndistortRectifyMap(K1, D1, R1, P1, (w, h), cv2.CV_32FC1) #perform rectification
     left_rectified = cv2.remap(leftFrame, leftMapX, leftMapY, cv2.INTER_LINEAR)
@@ -161,8 +218,8 @@ for i in range(len(color_images)):
 
     for y in range(0, 600, 30): #Draw lines to validate rectification
         line_thickness = 1
-        cv2.line(left_rectified, (0, y), (800, y), (0, 255, 0), thickness=line_thickness)
-        cv2.line(right_rectified, (0, y), (800, y), (0, 255, 0), thickness=line_thickness)
+        cv2.line(left_rectified, (0, y), (1600, y), (0, 255, 0), thickness=line_thickness)
+        cv2.line(right_rectified, (0, y), (1600, y), (0, 255, 0), thickness=line_thickness)
 
     cv2.imshow("Initial Color", leftFrame)
     cv2.imshow("Initial IR", rightFrame)
