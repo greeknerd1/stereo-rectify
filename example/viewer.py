@@ -35,13 +35,12 @@ def hist_equalization_16(img):
 
 
 def main():
-    k4a = PyK4A(
-        Config(
+    config = Config(
             color_resolution=pyk4a.ColorResolution.RES_720P,
             depth_mode=pyk4a.DepthMode.PASSIVE_IR,
             synchronized_images_only=True,
         )
-    )
+    k4a = PyK4A(config)
     k4a.start()
 
     # getters and setters directly get and set on device

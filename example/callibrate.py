@@ -5,9 +5,24 @@ import numpy as np
 import os
 import glob
 import itertools
+import pyk4a
+from pyk4a import Config
 
 
 from numpy.core.fromnumeric import argmax
+
+#Get callib matrix
+config = Config(
+            color_resolution=pyk4a.ColorResolution.RES_720P,
+            depth_mode=pyk4a.DepthMode.PASSIVE_IR,
+            synchronized_images_only=True,
+        )
+color_instrinsic = config.get_camera_matrix(CalibrationType.COLOR)
+color_dist_coeffs = config.get_distortion_coefficients(CalibrationType.COLOR)
+
+depth_instrinsic = config.get_camera_matrix(CalibrationType.DEPTH)
+depth_dist_coeffs = config.get_distortion_coefficients(CalibrationType.DEPTH)
+
 
 # Defining the dimensions of checkerboard
 CHECKERBOARD = (6,9)
