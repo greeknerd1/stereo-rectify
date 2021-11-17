@@ -49,6 +49,10 @@ def main():
     k4a.whitebalance = 4510
     assert k4a.whitebalance == 4510
 
+    #k4a.save_calibration_json('calibration_data')
+
+
+
     # while 1:
     #     capture = k4a.get_capture()
     #     if np.any(capture.color):

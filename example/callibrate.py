@@ -5,23 +5,8 @@ import numpy as np
 import os
 import glob
 import itertools
-import pyk4a
-from pyk4a import Config
-
-
+import json
 from numpy.core.fromnumeric import argmax
-
-#Get callib matrix
-config = Config(
-            color_resolution=pyk4a.ColorResolution.RES_720P,
-            depth_mode=pyk4a.DepthMode.PASSIVE_IR,
-            synchronized_images_only=True,
-        )
-color_instrinsic = config.get_camera_matrix(CalibrationType.COLOR)
-color_dist_coeffs = config.get_distortion_coefficients(CalibrationType.COLOR)
-
-depth_instrinsic = config.get_camera_matrix(CalibrationType.DEPTH)
-depth_dist_coeffs = config.get_distortion_coefficients(CalibrationType.DEPTH)
 
 
 # Defining the dimensions of checkerboard
@@ -33,8 +18,6 @@ objpoints = []
 # Creating vector to store vectors of 2D points for each checkerboard image
 imgpoints_color = [] 
 imgpoints_ir = []
-
-
 
 # Defining the world coordinates for 3D points
 objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
@@ -120,7 +103,6 @@ for camType in ['color', 'ir']:
 
 
 
-
 all_flags = [cv2.CALIB_FIX_INTRINSIC, cv2.CALIB_USE_INTRINSIC_GUESS, cv2.CALIB_FIX_PRINCIPAL_POINT, \
                                 cv2.CALIB_FIX_FOCAL_LENGTH, cv2.CALIB_FIX_ASPECT_RATIO, cv2.CALIB_SAME_FOCAL_LENGTH, \
                                 cv2.CALIB_ZERO_TANGENT_DIST, cv2.CALIB_RATIONAL_MODEL] #WITHOUT  cv2.CALIB_FIX_S1_S2_S3_S4, cv2.CALIB_TILTED_MODEL, cv2.CALIB_FIX_TAUX_TAUY
@@ -168,7 +150,6 @@ all_flags = [cv2.CALIB_FIX_INTRINSIC, cv2.CALIB_USE_INTRINSIC_GUESS, cv2.CALIB_F
 
 
 
-#look at previous flags in github and try those, try not moving the camera so much
 # print('Calling Stereo Callibrate-------------------')
 # rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), \
 #                                 flags=0
@@ -187,8 +168,46 @@ all_flags = [cv2.CALIB_FIX_INTRINSIC, cv2.CALIB_USE_INTRINSIC_GUESS, cv2.CALIB_F
 
 # print("Stereo calibration rms: ", rms)
 
-rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), flags=530) #530(with4) #540 774 16927 531 16387(without ir4)
+#rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), flags=530) #530(with4) #540 774 16927 531 16387(without ir4)
 #                                                                                                                                           
+
+
+
+
+#Read in camera instrinsics and distortion coefficients
+with open("calibration_data", "r") as f:
+    calibration_raw = f.read()
+calibration_json = json.loads(calibration_raw)
+cx, cy, fx, fy, k1, k2, k3, k4, k5, k6, codx, cody, p2, p1 = calibration_json['CalibrationInformation']['Cameras'][0]['Intrinsics']['ModelParameters']
+COLOR_INTRINSIC = np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
+COLOR_DIST = np.array([k1, k2, cx, cy, k3, k4, k5, k6])
+cx, cy, fx, fy, k1, k2, k3, k4, k5, k6, codx, cody, p2, p1 = calibration_json['CalibrationInformation']['Cameras'][1]['Intrinsics']['ModelParameters']
+IR_INTRINSIC = np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
+IR_DIST = np.array([k1, k2, cx, cy, k3, k4, k5, k6])
+
+
+print('Calling Stereo Callibrate-------------------')
+rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, COLOR_INTRINSIC, COLOR_DIST, IR_INTRINSIC, IR_DIST, (w, h), \
+                                flags=0
+                                + cv2.CALIB_FIX_INTRINSIC
+                                + cv2.CALIB_FIX_PRINCIPAL_POINT
+                                + cv2.CALIB_FIX_FOCAL_LENGTH
+                                + cv2.CALIB_FIX_K1
+                                + cv2.CALIB_FIX_K2
+                                + cv2.CALIB_FIX_K3
+                                + cv2.CALIB_FIX_K4
+                                + cv2.CALIB_FIX_K5
+                                + cv2.CALIB_FIX_K6)
+                                #+ cv2.CALIB_RATIONAL_MODEL
+                                #+ cv2.CALIB_FIX_ASPECT_RATIO #this for near, far
+                                #+ cv2.CALIB_ZERO_TANGENT_DIST) #this for near, far
+                                #+ cv2.CALIB_FIX_S1_S2_S3_S4 #maybe for far
+
+print("Stereo calibration rms: ", rms)
+
+
+
+
 
 print('Calling Stereo Rectify-------------------')
 R1, R2, P1, P2, Q, roi_left, roi_right = cv2.stereoRectify(K1, D1, K2, D2, (w, h), R, T, flags=cv2.CALIB_ZERO_DISPARITY, alpha=-1)
