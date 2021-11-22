@@ -13,6 +13,7 @@ from pyk4a import Config, PyK4A
 #     PASSIVE_IR = 5
 
 def hist_equalization_16(img):
+    print('begin', img.shape)
     #img_tif=cv2.imread("scan_before threthold_873.tif",cv2.IMREAD_ANYDEPTH)
     #img = np.asarray(img)
     flat = img.flatten()
@@ -30,6 +31,7 @@ def hist_equalization_16(img):
     cs = cs.astype('uint16')
     img_new = cs[flat]
     img_new = np.reshape(img_new, img.shape)
+    print('end', img_new.shape)
     return img_new
 
 
@@ -69,7 +71,10 @@ def main():
     # cv2.imshow("k4a", capture.depth)
     # cv2.imshow("k4a", capture.ir)
 
-    directory = r'C:\Users\OpenARK\Desktop\stereo-rectify\example\outside_checker'
+    directory = r'.\test5'
+
+    print(os.path.isdir(directory))
+
     os.chdir(directory)
     i = 0
     cv2.namedWindow("test")
@@ -196,6 +201,7 @@ def main():
 
             cv2.imwrite('color-' + str(i) + '.png', r_img_equalized)
             cv2.imwrite('ir-' + str(i) + '.png', ir_16_equalized)
+            print(ir_16_equalized.shape)
 
             # cv2.imwrite("PassiveIR_Raw.png", raw_ir)
             # cv2.imwrite("PassiveIR_Scaled.png", ir_scaled)
