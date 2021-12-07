@@ -108,10 +108,10 @@ all_flags = [cv2.CALIB_FIX_INTRINSIC, cv2.CALIB_USE_INTRINSIC_GUESS, cv2.CALIB_F
 with open("calibration_data", "r") as f:
     calibration_raw = f.read()
 calibration_json = json.loads(calibration_raw)
-cx, cy, fx, fy, k1, k2, k3, k4, k5, k6, codx, cody, p2, p1 = calibration_json['CalibrationInformation']['Cameras'][0]['Intrinsics']['ModelParameters']
+cx, cy, fx, fy, k1, k2, k3, k4, k5, k6, codx, cody, p2, p1 = calibration_json['CalibrationInformation']['Cameras'][1]['Intrinsics']['ModelParameters']
 COLOR_INTRINSIC = np.array([[fx * 1280, 0, cx * 1280], [0, fy * 720, cy * 720], [0, 0, 1]])
 COLOR_DIST = np.array([k1, k2, p1, p2, k3, k4, k5, k6])
-cx, cy, fx, fy, k1, k2, k3, k4, k5, k6, codx, cody, p2, p1 = calibration_json['CalibrationInformation']['Cameras'][1]['Intrinsics']['ModelParameters']
+cx, cy, fx, fy, k1, k2, k3, k4, k5, k6, codx, cody, p2, p1 = calibration_json['CalibrationInformation']['Cameras'][0]['Intrinsics']['ModelParameters']
 IR_INTRINSIC = np.array([[fx * 1024, 0, cx * 1024], [0, fy * 1024, cy * 1024], [0, 0, 1]])
 IR_DIST = np.array([k1, k2, p1, p2, k3, k4, k5, k6])
 
