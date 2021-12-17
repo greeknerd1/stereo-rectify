@@ -33,13 +33,19 @@ print("ir dist")
 print(IR_DIST)
 
 
+
 ir_img =  cv2.imread('./outside_checker_straight/ir-4.png', cv2.IMREAD_UNCHANGED)
 
+#ATTEMPT 3
+new_K, roi = cv2.getOptimalNewCameraMatrix(IR_INTRINSIC, IR_DIST, (1024, 1024), 1)
+map1, map2 = cv2.initUndistortRectifyMap(IR_INTRINSIC, IR_DIST, np.eye(3), new_K, (1024, 1024), cv2.CV_32FC1)
+undistorted_ir_img = cv2.remap(ir_img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+
 #ATTEMPT 2
-new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(IR_INTRINSIC, IR_FISHEYE_DIST, (1024, 1024), np.eye(3), balance=1, new_size = (1024, 1024), fov_scale = 1) #Balance sets the new focal length in range between the min focal length and the max focal length. Balance is in range of [0, 1]
-map1, map2 = cv2.fisheye.initUndistortRectifyMap(IR_INTRINSIC, IR_FISHEYE_DIST, np.eye(3), new_K, (1024, 1024), cv2.CV_32FC1) #CV_16SC2
-# and then remap:
-undistorted_ir_img = cv2.remap(ir_img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) #interpolation required, bordermode is optional but constant is default
+# new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(IR_INTRINSIC, IR_FISHEYE_DIST, (1024, 1024), np.eye(3), balance=1, new_size = (1024, 1024), fov_scale = 1) #Balance sets the new focal length in range between the min focal length and the max focal length. Balance is in range of [0, 1]
+# map1, map2 = cv2.fisheye.initUndistortRectifyMap(IR_INTRINSIC, IR_FISHEYE_DIST, np.eye(3), new_K, (1024, 1024), cv2.CV_32FC1) #CV_16SC2
+# # and then remap:
+# undistorted_ir_img = cv2.remap(ir_img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) #interpolation required, bordermode is optional but constant is default
 
 
 #ATTEMPT 1: FAILED :(

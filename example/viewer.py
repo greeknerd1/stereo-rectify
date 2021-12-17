@@ -5,6 +5,7 @@ import os
 
 import pyk4a
 from pyk4a import Config, PyK4A
+from pyk4a.calibration import CalibrationType
 
 # NFOV_2X2BINNED = 1
 #     NFOV_UNBINNED = 2
@@ -13,7 +14,6 @@ from pyk4a import Config, PyK4A
 #     PASSIVE_IR = 5
 
 def hist_equalization_16(img):
-    print('begin', img.shape)
     #img_tif=cv2.imread("scan_before threthold_873.tif",cv2.IMREAD_ANYDEPTH)
     #img = np.asarray(img)
     flat = img.flatten()
@@ -31,7 +31,6 @@ def hist_equalization_16(img):
     cs = cs.astype('uint16')
     img_new = cs[flat]
     img_new = np.reshape(img_new, img.shape)
-    print('end', img_new.shape)
     return img_new
 
 
@@ -51,7 +50,25 @@ def main():
     k4a.whitebalance = 4510
     assert k4a.whitebalance == 4510
 
-    #k4a.save_calibration_json('calibration_data')
+    k4a.save_calibration_json('calibration_data_december')
+
+    color_intr = k4a.calibration.get_camera_matrix(CalibrationType.COLOR)
+    color_dist = k4a.calibration.get_distortion_coefficients(CalibrationType.COLOR)
+    ir_intr = k4a.calibration.get_camera_matrix(CalibrationType.DEPTH)
+    ir_dist = k4a.calibration.get_distortion_coefficients(CalibrationType.DEPTH)
+
+    np.save('./savedCoeff/colorIntr.npy', color_intr)
+    np.save('./savedCoeff/colorDist.npy', color_dist)
+    np.save('./savedCoeff/irIntr.npy', ir_intr)
+    np.save('./savedCoeff/irDist.npy', ir_dist)
+
+    # Loading coefficients
+    # color_intr = np.load('./savedCoeff/colorIntr.npy')
+    # color_dist = np.load('./savedCoeff/colorDist.npy')
+    # ir_intr = np.load('./savedCoeff/irIntr.npy')
+    # ir_dist = np.load('./savedCoeff/irDist.npy')
+
+
 
 
 
@@ -71,7 +88,7 @@ def main():
     # cv2.imshow("k4a", capture.depth)
     # cv2.imshow("k4a", capture.ir)
 
-    directory = r'.\test5'
+    directory = r'.\december_callibration_images'
 
     print(os.path.isdir(directory))
 
@@ -201,7 +218,6 @@ def main():
 
             cv2.imwrite('color-' + str(i) + '.png', r_img_equalized)
             cv2.imwrite('ir-' + str(i) + '.png', ir_16_equalized)
-            print(ir_16_equalized.shape)
 
             # cv2.imwrite("PassiveIR_Raw.png", raw_ir)
             # cv2.imwrite("PassiveIR_Scaled.png", ir_scaled)

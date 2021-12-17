@@ -125,6 +125,8 @@ print(IR_INTRINSIC)
 print("ir dist")
 print(IR_DIST)
 
+exit()
+
 w, h = 1280, 720
 
 print('Calling Stereo Callibrate-------------------')
