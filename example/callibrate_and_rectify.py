@@ -119,6 +119,7 @@ print(IR_DIST)
 w, h = 1280, 720
 
 print('Calling Stereo Callibrate-------------------')
+#Approach 1: Using factory instrinsics
 rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, COLOR_INTRINSIC, COLOR_DIST, IR_INTRINSIC, IR_DIST, (w, h), \
                                 flags=0
                                 + cv2.CALIB_FIX_INTRINSIC
@@ -134,9 +135,6 @@ rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color
                                 #+ cv2.CALIB_RATIONAL_MODEL)
                                 #+ cv2.CALIB_FIX_ASPECT_RATIO) 
                                 #+ cv2.CALIB_ZERO_TANGENT_DIST)
-
-
-
 print("Stereo calibration rms: ", rms)
 
 print('Calling Stereo Rectify-------------------')
