@@ -118,66 +118,24 @@ print(IR_DIST)
 
 w, h = 1280, 720
 
-# *** OPTIMIZATION STUFF STARTS HERE
-
-print('[cv2.CALIB_FIX_INTRINSIC (256), cv2.CALIB_USE_INTRINSIC_GUESS (1), cv2.CALIB_FIX_PRINCIPAL_POINT (4), \
-                                cv2.CALIB_FIX_FOCAL_LENGTH (16), cv2.CALIB_FIX_ASPECT_RATIO (2), cv2.CALIB_SAME_FOCAL_LENGTH (512), \
-                                cv2.CALIB_ZERO_TANGENT_DIST (8), cv2.CALIB_RATIONAL_MODEL (16384), \
-                                cv2.CALIB_FIX_S1_S2_S3_S4 (65536), cv2.CALIB_TILTED_MODEL (262144), cv2.CALIB_FIX_TAUX_TAUY (524288)]')
-
-flagsComb = []
-for L in range(0, len(all_flags)+1):
-    for subset in itertools.combinations(all_flags, L):
-        flagsComb.append(subset)
-
-results = []
-i = 0
-for f in flagsComb:
-    print(str(i) + '/' + str(len(flagsComb)))
-    i += 1
-
-    rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, mtx1, dist1, mtx2, dist2, (w, h), flags=sum(f))
-    R1, R2, P1, P2, Q, roi_left, roi_right = cv2.stereoRectify(K1, D1, K2, D2, (w, h), R, T, flags=cv2.CALIB_ZERO_DISPARITY, alpha=-1)
-    x1, y1, w1, h1 = roi_left  
-    x2, y2, w2, h2 = roi_right
-    area = (w1 * h1) + (w2 * h2)
-    if rms < 6 and area > 0:
-        results.append((area, sum(f), f, rms))
-        
-
-x = sorted(results)
-for elem in x:
-    print(elem)
-
-with open("raw_december_stereo_callibrate_optimization.txt", 'w') as f:
-    for elem in x:
-        f.write(str(elem) + "\n")
-    f.close()
-    
-exit()
-
-# *** ENDS HERE
+print('Calling Stereo Callibrate-------------------')
+rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, COLOR_INTRINSIC, COLOR_DIST, IR_INTRINSIC, IR_DIST, (w, h), \
+                                flags=0
+                                + cv2.CALIB_FIX_INTRINSIC
+                                + cv2.CALIB_FIX_PRINCIPAL_POINT
+                                + cv2.CALIB_FIX_FOCAL_LENGTH
+                                + cv2.CALIB_FIX_K1
+                                + cv2.CALIB_FIX_K2
+                                + cv2.CALIB_FIX_K3
+                                + cv2.CALIB_FIX_K4
+                                + cv2.CALIB_FIX_K5
+                                + cv2.CALIB_FIX_K6)
+                                #+ cv2.CALIB_USE_INTRINSIC_GUESS
+                                #+ cv2.CALIB_RATIONAL_MODEL)
+                                #+ cv2.CALIB_FIX_ASPECT_RATIO) 
+                                #+ cv2.CALIB_ZERO_TANGENT_DIST)
 
 
-
-
-
-# print('Calling Stereo Callibrate-------------------')
-# rms, K1, D1, K2, D2, R, T, E, F = cv2.stereoCalibrate(objpoints, imgpoints_color, imgpoints_ir, COLOR_INTRINSIC, COLOR_DIST, IR_INTRINSIC, IR_DIST, (w, h), \
-#                                 flags=0
-                                # + cv2.CALIB_FIX_INTRINSIC
-                                # + cv2.CALIB_FIX_PRINCIPAL_POINT
-                                # + cv2.CALIB_FIX_FOCAL_LENGTH
-                                # + cv2.CALIB_FIX_K1
-                                # + cv2.CALIB_FIX_K2
-                                # + cv2.CALIB_FIX_K3
-                                # + cv2.CALIB_FIX_K4
-                                # + cv2.CALIB_FIX_K5
-                                # + cv2.CALIB_FIX_K6)
-#                                 #+ cv2.CALIB_USE_INTRINSIC_GUESS
-#                                 #+ cv2.CALIB_RATIONAL_MODEL)
-#                                 #+ cv2.CALIB_FIX_ASPECT_RATIO) 
-#                                 #+ cv2.CALIB_ZERO_TANGENT_DIST)
 
 print("Stereo calibration rms: ", rms)
 
