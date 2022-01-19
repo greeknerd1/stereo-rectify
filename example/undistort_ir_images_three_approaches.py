@@ -10,15 +10,11 @@ from numpy.core.fromnumeric import argmax
 
 #SECTION 1: UNDISTORT FISHEYE
 
-
-
 #Read in OpenCV compatible instrinsics & distortion coeffs
 COLOR_INTRINSIC = np.load('./savedCoeff/colorIntr.npy')
 COLOR_DIST = np.load('./savedCoeff/colorDist.npy')
 IR_INTRINSIC = np.load('./savedCoeff/irIntr.npy')
 IR_DIST = np.load('./savedCoeff/irDist.npy')
-
-IR_FISHEYE_DIST = np.array([IR_DIST[0], IR_DIST[1], IR_DIST[4], IR_DIST[5]]) #k1, k2, k3, k4 only
 
 
 print("FACTORY INTRINSINCS")
@@ -32,28 +28,27 @@ print("ir dist")
 print(IR_DIST)
 
 
-
-
 ir_img =  cv2.imread('./december_callibration_images/ir-11.png', cv2.IMREAD_UNCHANGED)
 
 #ATTEMPT 3 -- Works
-# new_K, roi = cv2.getOptimalNewCameraMatrix(IR_INTRINSIC, IR_DIST, (1024, 1024), 1)
-# map1, map2 = cv2.initUndistortRectifyMap(IR_INTRINSIC, IR_DIST, np.eye(3), new_K, (1024, 1024), cv2.CV_32FC1)
-# undistorted_ir_img = cv2.remap(ir_img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+new_K, roi = cv2.getOptimalNewCameraMatrix(IR_INTRINSIC, IR_DIST, (1024, 1024), 1)
+map1, map2 = cv2.initUndistortRectifyMap(IR_INTRINSIC, IR_DIST, np.eye(3), new_K, (1024, 1024), cv2.CV_32FC1)
+undistorted_ir_img = cv2.remap(ir_img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
 
-#ATTEMPT 2
+# IR_FISHEYE_DIST = np.array([IR_DIST[0], IR_DIST[1], IR_DIST[4], IR_DIST[5]]) #k1, k2, k3, k4 only
+
+#ATTEMPT 2: FAILED :(
 # print(IR_FISHEYE_DIST)
 # new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(IR_INTRINSIC, IR_FISHEYE_DIST, (1024, 1024), np.eye(3), balance=1, new_size = (1024, 1024), fov_scale = 1) #Balance sets the new focal length in range between the min focal length and the max focal length. Balance is in range of [0, 1]
 # map1, map2 = cv2.fisheye.initUndistortRectifyMap(IR_INTRINSIC, IR_FISHEYE_DIST, np.eye(3), new_K, (1024, 1024), cv2.CV_32FC1) #CV_16SC2
 # # and then remap:
 # undistorted_ir_img = cv2.remap(ir_img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) #interpolation required, bordermode is optional but constant is default
+
+# #ATTEMPT 1: FAILED :(
+# new_K, roi = cv2.getOptimalNewCameraMatrix(IR_INTRINSIC, IR_FISHEYE_DIST, (1024, 1024), 1)
+# undistorted_ir_img = cv2.fisheye.undistortImage(ir_img, IR_INTRINSIC, IR_FISHEYE_DIST, new_K) #size = ?
+
 print('-------------')
-
-#ATTEMPT 1: FAILED :(
-new_K, roi = cv2.getOptimalNewCameraMatrix(IR_INTRINSIC, IR_FISHEYE_DIST, (1024, 1024), 1)
-undistorted_ir_img = cv2.fisheye.undistortImage(ir_img, IR_INTRINSIC, IR_FISHEYE_DIST, new_K) #size = ?
-
-
 cv2.imshow("Distorted", ir_img)
 cv2.imshow("Undistorted", undistorted_ir_img)
 cv2.waitKey(0)
